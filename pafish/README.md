@@ -1,4 +1,4 @@
-# SandStorm
+# Pufferfish aka Pafish++
 
 The goal of this project is to create a way to utilize (userland) Sandbox checks
 into offensive workflow in a flexible, robust and opsec safe manner. 
@@ -6,10 +6,10 @@ Mainly, to address the decision making process of payload detonation in
 destination environment.
 
 ## Initial Concepts
-TBD . Userland only for now. 
+TBD. Userland only for now. 
 
 ## Initial work
-It is loosely initially based on Pafish (https://github.com/a0rtega/pafish). 
+It is currently based on Pafish (https://github.com/a0rtega/pafish). 
 This project has a decent set of the initial sandbox check set. 
 Unfortunately, the design and API interface, as well as the absence of opsec features 
 makes it somewhat limiting to the red teams in its current form.
