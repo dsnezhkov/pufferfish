@@ -5,11 +5,12 @@ WINDRES   = windres.exe
 OBJ       = Objects/MingW/main.o Objects/MingW/common.o Objects/MingW/utils.o Objects/MingW/debuggers.o Objects/MingW/sandboxie.o \
             Objects/MingW/vbox.o Objects/MingW/gensandbox.o Objects/MingW/wine.o Objects/MingW/vmware.o \
             Objects/MingW/qemu.o Objects/MingW/hooks.o Objects/MingW/cpu.o Objects/MingW/cuckoo.o Objects/MingW/bochs.o \
-            Objects/MingW/pafish_private.res
+            # Objects/MingW/pafish_private.res
 LINKOBJ   = $(OBJ)
 LIBS      = -lwsock32 -liphlpapi -lsetupapi -lmpr -lole32 -lwbemuuid -loleaut32 -lws2_32 -s
 INCS      =
-BIN       = Output/MingW/pafish.exe
+# BIN       = Output/MingW/pafish.exe
+BIN       = Output/MingW/pafish.dll
 CFLAGS    = $(INCS) -Wall -Wextra -Wpedantic -O0
 
 all: $(BIN)
@@ -20,7 +21,7 @@ clean:
 	del /Q Output\MingW\*.exe
 
 $(BIN): $(OBJ)
-	$(LINK) $(LINKOBJ) -o "$(BIN)" $(LIBS)
+	$(LINK) $(LINKOBJ) -shared -o "$(BIN)" $(LIBS)
 
 Objects/MingW/main.o: $(GLOBALDEPS) main.c
 	$(CC) -c main.c -o Objects/MingW/main.o $(CFLAGS)
@@ -64,5 +65,5 @@ Objects/MingW/cuckoo.o: $(GLOBALDEPS) cuckoo.c
 Objects/MingW/bochs.o: $(GLOBALDEPS) bochs.c
 	$(CC) -c bochs.c -o Objects/MingW/bochs.o $(CFLAGS)
 
-Objects/MingW/pafish_private.res: Objects/MingW/pafish_private.rc
-	$(WINDRES) Objects/MingW/pafish_private.rc --input-format=rc -o Objects/MingW/pafish_private.res -O coff
+# Objects/MingW/pafish_private.res: Objects/MingW/pafish_private.rc
+#	$(WINDRES) Objects/MingW/pafish_private.rc --input-format=rc -o Objects/MingW/pafish_private.res -O coff

@@ -60,20 +60,17 @@ int vmware_adapter_name() {
 	return pafish_check_adapter_name("VMware");
 }
 
-int vmware_devices(int writelogs) {
+int vmware_devices() {
 	HANDLE h;
 	const int count = 2;
 	string strs[count];
 	int res = FALSE, i = 0;
-	char message[200];
 
 	strs[0] = "\\\\.\\HGFS";
 	strs[1] = "\\\\.\\vmci";
 	for (i=0; i < count; i++) {
 		h = CreateFile(strs[i], GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (h != INVALID_HANDLE_VALUE) {
-			snprintf(message, sizeof(message)-sizeof(message[0]), "VMWare traced using device %s", strs[i]);
-			if (writelogs) write_log(message);
 			res = TRUE;
 		}
 	}

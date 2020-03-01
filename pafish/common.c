@@ -122,3 +122,18 @@ void exec_check(char * text, int (*callback)(), char * text_log, char * text_tra
 	else print_not_traced();
 }
 
+BOOL exec_check_silent(int (*callback)(), int plugWriteLog) {
+    int check_result;
+    int (*callback_int)(int) = callback;
+
+    /* Handle functions that write logs */
+    if (plugWriteLog)
+        check_result = callback();
+    else
+        check_result = callback_int(FALSE);
+
+    if (check_result == TRUE)
+        return TRUE;
+
+    return FALSE;
+}
