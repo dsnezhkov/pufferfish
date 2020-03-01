@@ -47,8 +47,12 @@
 int passGuard(void){return PF_SUCCESS;}
 int pass(){return PF_SUCCESS;}
 
+/* Guards */
 int debug_outputdebugstringGuard(void){
     /* This is only working on MS Windows systems prior to Vista */
+    OSVERSIONINFO winver;
+    winver.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    GetVersionEx(&winver);
     if (winver.dwMajorVersion < 6) {
         return PF_SUCCESS;
     }
@@ -58,7 +62,7 @@ int debug_outputdebugstringGuard(void){
 void exec_check_guard(struct execCheck* check){
 
     if ( check->call.guardCheck() == PF_SUCCESS){
-        if ( exec_check_silent(check->call.callback ) == TRUE ){
+        if ( exec_check(check->call.callback,1 ) == TRUE ){
             check->state.status = TRUE;
         }
     }else{
@@ -102,6 +106,11 @@ void sleepRandom(int tMin, int tMax, int iter){
     Sleep(interval);
 }
 
+/*
+ *
+ *  Checks
+ *
+ */
 __declspec(dllexport) void __cdecl checkGroupDebuggers(struct execCheckState * eState, DelayType dType, int tMin, int tMax, int iter) {
     for (unsigned int i = 0; i < (unsigned int) (sizeof(execChecksGroupDebuggers) / sizeof(execCheck)); i++) {
         delayRandom(dType, tMin, tMax, iter);
@@ -177,45 +186,37 @@ __declspec(dllexport) void __cdecl checkGroupCu(struct execCheckState * eState, 
     }
 }
 
-void getWinVer(void){
-    char winverstr[32], aux[1024];
-    // Seed (predictable sleep). TODO: rework for entropy
+__declspec(dllexport) void __cdecl getContextType(contextType * conType){
 
-
-    winver.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    GetVersionEx(&winver);
-    snprintf(winverstr, sizeof(winverstr) - sizeof(winverstr[0]),
-             "%lu.%lu build %lu", winver.dwMajorVersion,
-             winver.dwMinorVersion, winver.dwBuildNumber);
+    conType->winver.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    GetVersionEx(&conType->winver);
+    snprintf(conType->winverstr, sizeof(conType->winverstr) - sizeof(conType->winverstr[0]),
+             "%lu.%lu build %lu", conType->winver.dwMajorVersion,
+             conType->winver.dwMinorVersion, conType->winver.dwBuildNumber);
 
     /* Get CPU vendor */
-    cpu_write_vendor(cpu_vendor);
-    cpu_write_hv_vendor(cpu_hv_vendor);
-    cpu_write_brand(cpu_brand);
+    cpu_write_vendor(conType->cpu_vendor);
+    cpu_write_hv_vendor(conType->cpu_hv_vendor);
+    cpu_write_brand(conType->cpu_brand);
 
-    printf("[*] Windows version: %s\n", winverstr);
-    printf("[*] CPU: %s\n", cpu_vendor);
-    if (strlen(cpu_hv_vendor))
-        printf("    Hypervisor: %s\n", cpu_hv_vendor);
+    snprintf(conType->aux, sizeof(conType->aux) - sizeof(conType->aux[0]), "Windows version: %s",
+             conType->winverstr);
 
-    printf("    CPU brand: %s\n", cpu_brand);
-    snprintf(aux, sizeof(aux) - sizeof(aux[0]), "Windows version: %s",
-             winverstr);
-    printf("%s\n", aux);
-
-    if (strlen(cpu_hv_vendor))
-        snprintf(aux, sizeof(aux) - sizeof(aux[0]), "CPU: %s (HV: %s) %s", cpu_vendor,
-                 cpu_hv_vendor, cpu_brand);
+    if (strlen(conType->cpu_hv_vendor))
+        snprintf(conType->aux, sizeof(conType->aux) - sizeof(conType->aux[0]), "CPU: %s (HV: %s) %s", conType->cpu_vendor,
+                 conType->cpu_hv_vendor, conType->cpu_brand);
     else
-        snprintf(aux, sizeof(aux) - sizeof(aux[0]), "CPU: %s %s", cpu_vendor,
-                 cpu_brand);
-    printf("%s\n", aux);
+        snprintf(conType->aux, sizeof(conType->aux) - sizeof(conType->aux[0]), "CPU: %s %s", conType->cpu_vendor,
+                 conType->cpu_brand);
 
 }
 void seedRand(void) {
     srand( (unsigned)time( NULL ) );
 }
 
+void processAttach(void){
+    seedRand();
+}
 BOOL WINAPI DllMain(
         __attribute__((unused)) HINSTANCE hinstDLL,
         DWORD fdwReason,
@@ -224,8 +225,7 @@ BOOL WINAPI DllMain(
     switch( fdwReason )
     {
         case DLL_PROCESS_ATTACH:
-            seedRand();
-            getWinVer();
+            processAttach();
             break;
         case DLL_THREAD_ATTACH:
         case DLL_THREAD_DETACH:
@@ -236,31 +236,4 @@ BOOL WINAPI DllMain(
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
 }
-int main(void)
-{
 
-
-    /* printf("[*] GROUP: Debuggers detection\n");
-    checkGroupDebuggers(Compute, 0, 0, 200);
-    printf ("[*] GROUP: CPU information based detection\n");
-    checkGroupCPU(Time, 1000, 2000, 5);
-    printf ("[*] GROUP: Generic sandbox detection\n");
-    checkGroupGenericSandbox(Time, 100, 500, 1);
-    printf ("[*] GROUP: Hooks detection\n");
-    checkGroupHooks(Compute, 0, 0, 2000);
-    printf ("[*] GROUP: Sandboxie detection\n");
-    checkGroupSandboxie(Compute, 0, 0, 2);
-    printf ("[*] GROUP: VBox detection\n");
-    checkGroupVBox(Time, 800, 1001, 17);
-    printf ("[*] GROUP: VMware detection\n");
-    checkGroupVMware(Compute, 0, 0, 16);
-    printf ("[*] GROUP: Quemu detection\n");
-    checkGroupQuemu(Compute, 0, 0, 200);
-    printf ("[*] GROUP: Bochs detection\n");
-    checkGroupBochs(Time, 5030, 6010, 10);
-    printf ("[*] GROUP: Cuckoo detection\n");
-    checkGroupCu(Time, 50, 1000, 4);
-    */
-
-	return 0;
-}

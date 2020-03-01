@@ -35,6 +35,7 @@
 
 
 typedef int (*execCheckCallback)();
+
 typedef int (*execCheckCallbackGuard)();
 
 typedef struct execCheckCall {
@@ -50,18 +51,24 @@ typedef struct execCheck {
 int debug_outputdebugstringGuard(void);
 
 int passGuard(void);
+
 int pass(void);
 
 void exec_check_guard(struct execCheck *);
+
 void sleepRandom(int, int, int i);
 
 execCheck execChecksGroupDebuggers[N_GP_DEBUGGERS] = {
         {
-                "IsDebuggerPresent()",
-                0,
-                "",
-                &debug_isdebuggerpresent,
-                &passGuard
+                {
+                        "IsDebuggerPresent()",
+                        0,
+                        ""
+                },
+                {
+                        &debug_isdebuggerpresent,
+                        &passGuard
+                }
         },
         {
                 "OutputDebugString()",
@@ -193,8 +200,8 @@ execCheck execChecksGroupGenericSandbox[N_GP_GEN_SANDBOX] = {
 
 execCheck execChecksGroupHooks[N_GP_HOOKS] = {
         {
-               "hi_hooks_shellexecuteexw_m1",
-                0,
+                "hi_hooks_shellexecuteexw_m1",
+                1,
                 "",
                 &check_hook_ShellExecuteExW_m1,
                 &passGuard
@@ -461,12 +468,11 @@ execCheck execChecksGroupCu[N_GP_CU] = {
                 "hi_cuckoo_tls",
                 0,
                 "",
-                &cuckoo_check_tls,
+                // &cuckoo_check_tls, dies - investigate
+                &pass,
                 &passGuard
         }
 };
 
-char cpu_vendor[13], cpu_hv_vendor[13], cpu_brand[49];
-OSVERSIONINFO winver;
 
 #endif //CHECKDEFS_H

@@ -12,19 +12,28 @@ void dumpCheck(execCheckState * eState, int nMembers){
         printf("%s: %d %s\n", eState[i].text, eState[i].status, eState[i].statusMsg);
     }
 }
+void dumpContext(contextType * conType){
 
+    printf("[*] Windows version: %s\n", conType->winverstr);
+    printf("[*] CPU: %s\n", conType->cpu_vendor);
+    if (strlen(conType->cpu_hv_vendor))
+        printf("    Hypervisor: %s\n", conType->cpu_hv_vendor);
+    printf("    CPU brand: %s\n", conType->cpu_brand);
+    printf("%s\n", conType->aux);
+}
 int main() {
 
-    struct execCheckState eStateDebuggers[N_GP_DEBUGGERS], *eStateDebuggersPtr=NULL;
-    struct execCheckState eStateCPU[N_GP_CPU], *eStateCPUPtr=NULL;
-    struct execCheckState eStateGenSandbox[N_GP_GEN_SANDBOX], *eStateGenSandboxPtr=NULL;
-    struct execCheckState eStateHooks[N_GP_HOOKS], *eStateHooksPtr=NULL;
-    struct execCheckState eStateSandboxie[N_GP_HOOKS], *eStateSandboxiePtr=NULL;
-    struct execCheckState eStateVBox[N_GP_VBOX], *eStateVBoxPtr=NULL;
-    struct execCheckState eStateVMWare[N_GP_VMWARE], *eStateVMwarePtr=NULL;
-    struct execCheckState eStateQuemu[N_GP_QUEMU], *eStateQuemuPtr=NULL;
-    struct execCheckState eStateBochs[N_GP_BOCHS], *eStateBochsPtr=NULL;
-    struct execCheckState eStateCu[N_GP_CU], *eStateCuPtr=NULL;
+    struct execCheckState eStateDebuggers[N_GP_DEBUGGERS] = {{0}}, *eStateDebuggersPtr=NULL;
+    struct execCheckState eStateCPU[N_GP_CPU] = {{0}}, *eStateCPUPtr=NULL;
+    struct execCheckState eStateGenSandbox[N_GP_GEN_SANDBOX] = {{0}}, *eStateGenSandboxPtr=NULL;
+    struct execCheckState eStateHooks[N_GP_HOOKS]  = {{0}}, *eStateHooksPtr=NULL;
+    struct execCheckState eStateSandboxie[N_GP_HOOKS] = {{0}}, *eStateSandboxiePtr=NULL;
+    struct execCheckState eStateVBox[N_GP_VBOX] = {{0}}, *eStateVBoxPtr=NULL;
+    struct execCheckState eStateVMWare[N_GP_VMWARE] = {{0}}, *eStateVMwarePtr=NULL;
+    struct execCheckState eStateQuemu[N_GP_QUEMU] = {{0}}, *eStateQuemuPtr=NULL;
+    struct execCheckState eStateBochs[N_GP_BOCHS] = {{0}}, *eStateBochsPtr=NULL;
+    struct execCheckState eStateCu[N_GP_CU] = {{0}}, *eStateCuPtr=NULL;
+    struct contextType conType;
 
     eStateDebuggersPtr = eStateDebuggers;
     eStateCPUPtr = eStateCPU;
@@ -39,6 +48,9 @@ int main() {
 
 
     HMODULE hModule = LoadLibrary(TEXT("pafish.dll"));
+
+    getContextType_Ptr getContextType  =
+            (getContextType_Ptr) GetProcAddress(hModule, "getContextType");
 
     checkGroupDebuggers_Ptr checkDebuggers  =
             (checkGroupDebuggers_Ptr) GetProcAddress(hModule, "checkGroupDebuggers");
@@ -64,6 +76,9 @@ int main() {
     /*
      *  Run the groups
     */
+    printf("[X] GETTING CONTEXT [X]\n");
+    getContextType(&conType);
+
     printf("[X] RUNNING GROUP CHECKS [X]\n");
     printf("-- Group: Debuggers --\n");
     checkDebuggers(eStateDebuggersPtr, Time, 300, 700, 2);
@@ -84,15 +99,16 @@ int main() {
     printf("-- Group: Bochs --\n");
     checkBochs(eStateBochsPtr, Time, 10, 20, 2);
     printf("-- Group: Cuckoo --\n");
-    checkCu(eStateCuPtr, Time, 10, 20, 2);
-    /*
-    */
+    checkCu(eStateCuPtr, Time, 100, 200, 1);
 
 
     /*
      * Dump the results
      */
     printf("\n\n[X] PRINTING GROUP CHECKS RESULTS [X]\n");
+    printf("Disposition:\n");
+    dumpContext(&conType);
+
     dumpCheck(eStateDebuggersPtr,N_GP_DEBUGGERS);
     dumpCheck(eStateCPUPtr,N_GP_CPU);
     dumpCheck(eStateGenSandboxPtr,N_GP_GEN_SANDBOX);

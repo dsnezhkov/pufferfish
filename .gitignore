@@ -3,3 +3,7 @@
 hi_*
 .vagrant
 .iml
+.idea/
+Objects/
+Output/
+

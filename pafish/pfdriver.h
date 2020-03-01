@@ -5,6 +5,15 @@
 #ifndef PFDRIVER_H
 #define PFDRIVER_H
 
+typedef struct contextType{
+    char cpu_vendor[13];
+    char cpu_hv_vendor[13];
+    char cpu_brand[49];
+    char winverstr[32];
+    char aux[1024];
+    OSVERSIONINFO winver;
+}contextType;
+
 typedef struct execCheckState {
     char text[256];
     unsigned int status;
@@ -36,17 +45,18 @@ __declspec(dllexport) void __cdecl checkGroupVMware(struct execCheckState * eSta
 __declspec(dllexport) void __cdecl checkGroupQuemu(struct execCheckState * eState, DelayType dType, int tMin, int tMax, int iter);
 __declspec(dllexport) void __cdecl checkGroupBochs(struct execCheckState * eState, DelayType dType, int tMin, int tMax, int iter);
 __declspec(dllexport) void __cdecl checkGroupCu(struct execCheckState * eState, DelayType dType, int tMin, int tMax, int iter);
-
+__declspec(dllexport) void __cdecl getContextType(struct contextType * conType);
 
 typedef void(__cdecl *checkGroupDebuggers_Ptr)(struct execCheckState *, int, int, int, int);
-typedef int(__cdecl *checkGroupCPU_Ptr)(struct execCheckState *, int, int, int, int);
-typedef int(__cdecl *checkGroupGenericSandbox_Ptr)(struct execCheckState *, int, int, int, int);
-typedef int(__cdecl *checkGroupHooks_Ptr)(struct execCheckState *, int, int, int, int);
-typedef int(__cdecl *checkGroupSandboxie_Ptr)(struct execCheckState *, int, int, int, int);
-typedef int(__cdecl *checkGroupVBox_Ptr)(struct execCheckState *, int, int, int, int);
-typedef int(__cdecl *checkGroupVMware_Ptr)(struct execCheckState *, int, int, int, int);
-typedef int(__cdecl *checkGroupQuemu_Ptr)(struct execCheckState *, int, int, int, int);
-typedef int(__cdecl *checkGroupBochs_Ptr)(struct execCheckState *, int, int, int, int);
-typedef int(__cdecl *checkGroupCu_Ptr)(struct execCheckState *, int, int, int, int);
+typedef void(__cdecl *checkGroupCPU_Ptr)(struct execCheckState *, int, int, int, int);
+typedef void(__cdecl *checkGroupGenericSandbox_Ptr)(struct execCheckState *, int, int, int, int);
+typedef void(__cdecl *checkGroupHooks_Ptr)(struct execCheckState *, int, int, int, int);
+typedef void(__cdecl *checkGroupSandboxie_Ptr)(struct execCheckState *, int, int, int, int);
+typedef void(__cdecl *checkGroupVBox_Ptr)(struct execCheckState *, int, int, int, int);
+typedef void(__cdecl *checkGroupVMware_Ptr)(struct execCheckState *, int, int, int, int);
+typedef void(__cdecl *checkGroupQuemu_Ptr)(struct execCheckState *, int, int, int, int);
+typedef void(__cdecl *checkGroupBochs_Ptr)(struct execCheckState *, int, int, int, int);
+typedef void(__cdecl *checkGroupCu_Ptr)(struct execCheckState *, int, int, int, int);
+typedef void(__cdecl *getContextType_Ptr)(struct contextType *);
 
 #endif //PFDRIVER_H

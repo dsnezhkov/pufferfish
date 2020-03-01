@@ -22,6 +22,6 @@ void write_trace_dns(char product[]);
 
 void print_check_group(char * text);
 
-void exec_check(char * text, int (*callback)(), char * text_log, char * text_trace);
+BOOL exec_check(int (*callback)(), int plugLog);
 
 #endif
