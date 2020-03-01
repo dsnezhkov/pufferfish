@@ -1,21 +1,5 @@
-
-/*
-   Pafish (Paranoid fish)
-
-   All code from this project, including
-   functions, procedures and the main program
-   is licensed under GNU/GPL version 3.
-
-   So, if you are going to use functions or
-   procedures from this project to develop
-   your malware, you have to release the
-   source code as well :)
-
-   - Alberto Ortega
-
-   Blue fish icon thanks to http://www.fasticon.com/
-
- */
+// Original code for checks: aOrtega
+// dsnezhkov API, grouping, dll.
 
 #include <stdio.h>
 #include <stdlib.h>
