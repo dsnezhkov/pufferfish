@@ -1,10 +1,7 @@
 *.o
-*.log
-hi_*
-.vagrant
 .iml
 .idea/
-Objects/
-Output/
-cmake-build-debug/
+Objects/**
+Output/**
+cmake-build-debug/**
 
