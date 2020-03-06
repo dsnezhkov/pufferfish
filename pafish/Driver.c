@@ -47,8 +47,12 @@ int main() {
     eStateCuPtr = eStateCu;
 
 
-    HMODULE hModule = LoadLibrary(TEXT("pafish.dll"));
+    HMODULE hModule = LoadLibrary(TEXT("libpufferfish.dll"));
 
+    if (hModule == NULL){
+       printf("Error finding or loading the check DLL");
+       exit(2);
+    }
     getContextType_Ptr getContextType  =
             (getContextType_Ptr) GetProcAddress(hModule, "getContextType");
 

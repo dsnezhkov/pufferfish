@@ -1,45 +1,40 @@
 cmake_minimum_required(VERSION 3.15)
-project(pafish)
+project(pufferfish)
 
-set(CMAKE_CXX_STANDARD 14)
-
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(PAFISH ${PROJECT_SOURCE_DIR}/pafish)
 include_directories(pafish)
 
-add_executable(pafish
-        pafish/bochs.c
-        pafish/bochs.h
-        pafish/common.c
-        pafish/common.h
-        pafish/config.h
-        pafish/cpu.c
-        pafish/cpu.h
-        pafish/cuckoo.c
-        pafish/cuckoo.h
-        pafish/debuggers.c
-        pafish/debuggers.h
-        pafish/gensandbox.c
-        pafish/gensandbox.h
-        pafish/hi_CPU_VM_hv_vendor_name
-        pafish/hi_CPU_VM_hypervisor_bit
-        pafish/hi_CPU_VM_rdtsc_force_vm_exit
-        pafish/hi_sandbox_mouse_act
-        pafish/hooks.c
-        pafish/hooks.h
-        pafish/chutil.c
-        pafish/Makefile.linux
-        pafish/Makefile.win
-        pafish/qemu.c
-        pafish/qemu.h
-        pafish/sandboxie.c
-        pafish/sandboxie.h
-        pafish/types.h
-        pafish/utils.c
-        pafish/utils.h
-        pafish/vbox.c
-        pafish/vbox.h
-        pafish/vmware.c
-        pafish/vmware.h
-        pafish/wine.c
-        pafish/wine.h
-        .gitignore
-        README.md pafish/Driver.c pafish/pfdriver.h)
+
+# Objects for checks
+add_library(cpu OBJECT ${PAFISH}/cpu.c )
+add_library(debuggers OBJECT ${PAFISH}/debuggers.c )
+add_library(gensandbox OBJECT ${PAFISH}/gensandbox.c )
+add_library(hooks OBJECT ${PAFISH}/hooks.c )
+add_library(sandboxie OBJECT ${PAFISH}/sandboxie.c )
+add_library(vbox OBJECT ${PAFISH}/vbox.c )
+add_library(vmware OBJECT ${PAFISH}/vmware.c )
+add_library(wine OBJECT ${PAFISH}/wine.c )
+add_library(qemu OBJECT ${PAFISH}/qemu.c )
+add_library(bochs OBJECT ${PAFISH}/bochs.c )
+add_library(cuckoo OBJECT ${PAFISH}/cuckoo.c )
+
+# Shared Library
+add_library(pufferfish SHARED ${PAFISH}/chutil.c ${PAFISH}/common.c ${PAFISH}/utils.c)
+
+# Objects for checks
+target_link_libraries(pufferfish PRIVATE
+        cpu debuggers gensandbox hooks sandboxie vbox vmware wine qemu bochs cuckoo )
+
+# External libs
+target_link_libraries(pufferfish PRIVATE wsock32 iphlpapi mpr ole32 wbemuuid oleaut32 ws2_32 )
+# Compiler flags
+target_compile_options(pufferfish PRIVATE  -Wall -Wextra -Wpedantic -O0)
+
+# Test Driver
+add_executable(Driver ${PAFISH}/Driver.c)
+target_compile_options(Driver PRIVATE  -Wall -Wextra -Wpedantic)
+
